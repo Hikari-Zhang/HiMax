@@ -69,6 +69,9 @@ export interface StatsData {
 declare global {
   interface Window {
     electronAPI?: {
+      // Platform Info
+      platform: 'win32' | 'darwin' | 'linux'
+
       // Window Controls
       minimize: () => void
       maximize: () => void

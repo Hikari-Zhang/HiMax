@@ -1,6 +1,9 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  // ─── Platform Info ────────────────
+  platform: process.platform, // 'win32' | 'darwin' | 'linux'
+
   // ─── Window Controls ────────────────
   minimize: () => ipcRenderer.send('window-minimize'),
   maximize: () => ipcRenderer.send('window-maximize'),

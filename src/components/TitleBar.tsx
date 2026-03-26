@@ -9,6 +9,9 @@ export function TitleBar() {
   const { theme, toggleTheme } = useAppStore()
   const [isMaximized, setIsMaximized] = useState(false)
 
+  // Detect macOS — traffic lights are handled natively
+  const isMac = window.electronAPI?.platform === 'darwin'
+
   useEffect(() => {
     // Check initial maximize state
     window.electronAPI?.isMaximized().then(setIsMaximized)
@@ -27,8 +30,11 @@ export function TitleBar() {
 
   return (
     <div className="drag-region flex items-center justify-between h-10 px-4 bg-bg-secondary border-b border-border shrink-0 theme-transition">
-      {/* Left: App Title */}
-      <div className="flex items-center gap-2 no-drag" style={{ marginLeft: 5 }}>
+      {/* Left: App Title — on macOS, leave space for traffic lights (≈70px) */}
+      <div
+        className="flex items-center gap-2 no-drag"
+        style={{ marginLeft: isMac ? 70 : 5 }}
+      >
         <div className="w-5 h-5 rounded-md bg-accent flex items-center justify-center">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
             <path d="M12 5v14M5 12l7 7 7-7" />
@@ -57,27 +63,30 @@ export function TitleBar() {
           {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
         </button>
 
-        <div className="w-px h-4 bg-border mx-1" />
-
-        {/* Window Controls */}
-        <button
-          onClick={handleMinimize}
-          className="p-1.5 rounded-md hover:bg-bg-hover text-text-secondary hover:text-text-primary transition-colors"
-        >
-          <Minus size={14} />
-        </button>
-        <button
-          onClick={handleMaximize}
-          className="p-1.5 rounded-md hover:bg-bg-hover text-text-secondary hover:text-text-primary transition-colors"
-        >
-          {isMaximized ? <Copy size={12} /> : <Square size={12} />}
-        </button>
-        <button
-          onClick={handleClose}
-          className="p-1.5 rounded-md hover:bg-red-500/20 text-text-secondary hover:text-red-400 transition-colors"
-        >
-          <X size={14} />
-        </button>
+        {/* Window Controls — hidden on macOS (uses native traffic lights) */}
+        {!isMac && (
+          <>
+            <div className="w-px h-4 bg-border mx-1" />
+            <button
+              onClick={handleMinimize}
+              className="p-1.5 rounded-md hover:bg-bg-hover text-text-secondary hover:text-text-primary transition-colors"
+            >
+              <Minus size={14} />
+            </button>
+            <button
+              onClick={handleMaximize}
+              className="p-1.5 rounded-md hover:bg-bg-hover text-text-secondary hover:text-text-primary transition-colors"
+            >
+              {isMaximized ? <Copy size={12} /> : <Square size={12} />}
+            </button>
+            <button
+              onClick={handleClose}
+              className="p-1.5 rounded-md hover:bg-red-500/20 text-text-secondary hover:text-red-400 transition-colors"
+            >
+              <X size={14} />
+            </button>
+          </>
+        )}
       </div>
     </div>
   )

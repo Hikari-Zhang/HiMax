@@ -12,15 +12,21 @@
     "dist": "vite build && electron-builder",
     "dist:win": "vite build && electron-builder --win --config.win.target=nsis",
     "dist:portable": "vite build && electron-builder --win --config.win.target=portable",
-    "dist:win:all": "vite build && electron-builder --win"
+    "dist:win:all": "vite build && electron-builder --win",
+    "dist:mac": "vite build && electron-builder --mac",
+    "dist:mac:arm64": "vite build && electron-builder --mac --arm64",
+    "dist:mac:x64": "vite build && electron-builder --mac --x64",
+    "dist:mac:universal": "vite build && electron-builder --mac --universal",
+    "dist:linux": "vite build && electron-builder --linux"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "build": {
-    "appId": "com.downie.app",
-    "productName": "Downie",
+    "appId": "com.himax.app",
+    "productName": "HiMax",
+    "artifactName": "HiMax-${version}-${os}-${arch}.${ext}",
     "directories": {
       "output": "release"
     },
@@ -32,14 +38,18 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "portable",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
-      "icon": null
+      "icon": "build/icon.ico"
     },
     "portable": {
       "artifactName": "HiMax-${version}-Portable.exe"
@@ -53,8 +63,60 @@
       "shortcutName": "HiMax"
     },
     "mac": {
-      "target": ["dmg"],
-      "category": "public.app-category.utilities"
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png",
+      "category": "public.app-category.utilities",
+      "darkModeSupport": true,
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
+    },
+    "dmg": {
+      "title": "HiMax ${version}",
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icons",
+      "category": "Utility"
     }
   },
   "dependencies": {

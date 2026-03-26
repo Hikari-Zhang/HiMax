@@ -2,10 +2,15 @@
  * App Paths - Centralized path management
  * 
  * All application data (config, binaries, cookies, debug logs) is stored
- * WITHIN the installation directory so that uninstalling the app removes
- * everything cleanly — no orphan files in %APPDATA%.
+ * in a persistent, writable location:
  *
- * Directory layout (relative to install root):
+ * - Windows (NSIS):     <install_dir>/appdata/
+ * - Windows (Portable): <exe_dir>/appdata/
+ * - macOS:              ~/Library/Application Support/HiMax/
+ * - Linux:              ~/.config/HiMax/
+ * - Development:        <project_root>/appdata/
+ *
+ * Directory layout:
  *   appdata/
  *   ├── bin/          yt-dlp, ffmpeg, ffprobe
  *   ├── data/         settings.json, tasks.json
@@ -22,18 +27,18 @@ const fs = require('fs')
  * - In development (npm run dev:electron):
  *     app.getAppPath() → project root (D:\AI\projects\Downie)
  * 
- * - In production (NSIS installer):
+ * - In production (NSIS installer, Windows):
  *     process.resourcesPath → <install_dir>/resources
  *     So the install root is one level up: path.dirname(process.resourcesPath)
  * 
- * - In production (portable exe):
+ * - In production (portable exe, Windows):
  *     The exe unpacks to a temp dir, so process.resourcesPath points to temp.
  *     We use the exe's actual location (process.env.PORTABLE_EXECUTABLE_DIR or
  *     path.dirname(process.execPath)) as the root so data persists next to the exe.
  */
 function getAppRoot() {
   if (app.isPackaged) {
-    // Portable mode: env var PORTABLE_EXECUTABLE_DIR is set by electron-builder portable
+    // Portable mode (Windows only): env var PORTABLE_EXECUTABLE_DIR is set by electron-builder portable
     if (process.env.PORTABLE_EXECUTABLE_DIR) {
       return process.env.PORTABLE_EXECUTABLE_DIR
     }
@@ -46,9 +51,22 @@ function getAppRoot() {
 
 /**
  * Get the base directory for all persistent application data.
- * This is <app_root>/appdata/ — lives inside the install directory.
+ * 
+ * macOS:    ~/Library/Application Support/HiMax/
+ * Linux:    ~/.config/HiMax/ (via app.getPath('userData'))
+ * Windows:  <install_dir>/appdata/ (lives inside the install directory for clean uninstall)
+ * Dev:      <project_root>/appdata/
  */
 function getAppDataDir() {
+  if (app.isPackaged && process.platform === 'darwin') {
+    // macOS: .app bundles are read-only, use ~/Library/Application Support/HiMax/
+    return app.getPath('userData')
+  }
+  if (app.isPackaged && process.platform === 'linux') {
+    // Linux: ~/.config/HiMax/
+    return app.getPath('userData')
+  }
+  // Windows (installed or portable) & development: <root>/appdata/
   return path.join(getAppRoot(), 'appdata')
 }
 

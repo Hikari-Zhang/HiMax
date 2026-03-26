@@ -20,6 +20,8 @@ function createWindow() {
   // All config/binaries/cookies are stored here for clean uninstall
   ensureDir(getAppDataDir())
 
+  const isMac = process.platform === 'darwin'
+
   mainWindow = new BrowserWindow({
     width: 1100,
     height: 720,
@@ -27,6 +29,10 @@ function createWindow() {
     minHeight: 600,
     frame: false,
     titleBarStyle: 'hidden',
+    // macOS: position the native traffic light buttons
+    ...(isMac ? {
+      trafficLightPosition: { x: 12, y: 12 },
+    } : {}),
     backgroundColor: '#0f0f0f',
     webPreferences: {
       nodeIntegration: false,
