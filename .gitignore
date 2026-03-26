@@ -1,4 +1,34 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
+release*/
+
+# Runtime app data (binaries, user settings, debug logs)
+appdata/
+
+# WorkBuddy memory (session-specific, not project code)
+.workbuddy/memory/
+
+# Temporary & test files
+temp_*.json
+test_*.js
+scan-files.js
+build-*.js
+build-*.txt
+check-*.js
+
+# Logs
 *.log
-release*
+npm-debug.log*
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
