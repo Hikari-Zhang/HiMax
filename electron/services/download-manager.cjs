@@ -985,6 +985,29 @@ class DownloadManager {
         if (data.maxConcurrent) {
           this.maxConcurrent = data.maxConcurrent
         }
+
+        // Fix hardcoded username in defaultDir/cookieFile:
+        // If the path contains a different username than the current user, reset it
+        const currentUser = process.env.USERNAME || process.env.USER || ''
+        const downloadsPath = app.getPath('downloads')
+        if (this.settings.defaultDir && currentUser) {
+          // Check if path contains a Windows user dir with a different username
+          const userDirMatch = this.settings.defaultDir.match(/[\\/]Users[\\/](.+?)[\\/]/)
+          if (userDirMatch && userDirMatch[1] !== currentUser) {
+            console.log(`[DownloadManager] Resetting defaultDir: old user "${userDirMatch[1]}" != current "${currentUser}"`)
+            this.settings.defaultDir = downloadsPath
+            this._saveSettings() // Persist the fix
+          }
+        }
+        if (this.settings.cookieFile && currentUser) {
+          const cookieMatch = this.settings.cookieFile.match(/[\\/]Users[\\/](.+?)[\\/]/)
+          if (cookieMatch && cookieMatch[1] !== currentUser) {
+            console.log(`[DownloadManager] Resetting cookieFile: old user "${cookieMatch[1]}" != current "${currentUser}"`)
+            delete this.settings.cookieFile
+            this._saveSettings()
+          }
+        }
+
         console.log('[DownloadManager] Loaded settings from', this.settingsFile)
       }
     } catch (e) {
